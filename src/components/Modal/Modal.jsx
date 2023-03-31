@@ -1,49 +1,48 @@
 import s from './Modal.module.scss';
-import { createPortal } from 'react-dom';
-import { Component } from 'react';
+import usePortal from 'react-useportal';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const modalRoot = document.querySelector('#modal-root');
+const Modal = ({ closeModal, image, descr }) => {
+  const { Portal } = usePortal({
+    bindTo: document && document.getElementById('modal-root'),
+  });
 
-class Modal extends Component {
-  static propTypes = {
-    image: PropTypes.string.isRequired,
-    descr: PropTypes.string.isRequired,
-    closeModal: PropTypes.func.isRequired,
-  };
+  useEffect(() => {
+    window.addEventListener('keydown', handleCloseModalByEscape);
 
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleCloseModalByEscape);
-  }
+    return () => {
+      window.removeEventListener('keydown', handleCloseModalByEscape);
+    };
+  });
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleCloseModalByEscape);
-  }
-
-  handleCloseModalByEscape = e => {
-    if (e.code === 'Escape') {
-      console.log('Escape');
-      this.props.closeModal();
-    }
-  };
-
-  handleCloseModal = e => {
+  const handleCloseModal = e => {
     if (e.target === e.currentTarget) {
-      this.props.closeModal();
+      closeModal();
     }
   };
 
-  render() {
-    const { image, descr } = this.props;
-    return createPortal(
-      <div className={s.Overlay} onClick={this.handleCloseModal}>
+  const handleCloseModalByEscape = e => {
+    if (e.code === 'Escape') {
+      closeModal();
+    }
+  };
+
+  return (
+    <Portal>
+      <div className={s.Overlay} onClick={handleCloseModal}>
         <div className={s.Modal}>
           <img src={image} alt={descr} />
         </div>
-      </div>,
-      modalRoot
-    );
-  }
-}
+      </div>
+    </Portal>
+  );
+};
+
+Modal.propTypes = {
+  image: PropTypes.string.isRequired,
+  descr: PropTypes.string.isRequired,
+  closeModal: PropTypes.func.isRequired,
+};
 
 export default Modal;
