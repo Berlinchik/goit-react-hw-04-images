@@ -28,7 +28,7 @@ export const App = () => {
       setError(null);
       (async () => {
         try {
-          const fetchedItems = await fetchData(query, page);
+          const fetchedItems = await fetchData(query);
           if (fetchedItems.hits.length === 0) {
             throw new Error('Nothing found! Check that the input is correct');
           }
@@ -41,7 +41,6 @@ export const App = () => {
         }
       })();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   useEffect(() => {
